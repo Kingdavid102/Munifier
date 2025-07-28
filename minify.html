@@ -1,99 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Code Minifier</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap">
   <style>
     body {
+      font-family: 'Orbitron', sans-serif;
       background: #0f0f0f;
-      color: #f0f0f0;
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
+      color: #fff;
       padding: 20px;
+      text-align: center;
     }
-
     h1 {
-      color: #00ff88;
-      text-shadow: 0 0 10px #00ff88;
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff;
     }
-
     textarea {
       width: 90%;
       height: 200px;
       margin: 10px auto;
-      background: #1a1a1a;
-      color: #ffffff;
-      border: 1px solid #00ff88;
+      display: block;
+      background: #111;
+      color: #0f0;
+      border: 1px solid #0ff;
       padding: 10px;
       border-radius: 10px;
       resize: vertical;
     }
-
-    input[type="file"] {
-      margin: 10px;
-    }
-
-    .buttons {
-      margin: 20px;
-    }
-
     button {
-      background: linear-gradient(90deg, #00ff88, #007766);
-      color: white;
-      border: none;
+      background: #111;
+      color: #0ff;
+      border: 2px solid #0ff;
       padding: 10px 20px;
-      margin: 10px;
-      font-size: 16px;
-      border-radius: 8px;
+      margin: 5px;
+      border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 0 10px #00ff88;
-      transition: all 0.3s ease;
+      font-size: 1em;
+      text-shadow: 0 0 5px #0ff;
+      transition: 0.3s ease;
     }
-
     button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #00ff88;
+      background: #0ff;
+      color: #111;
+      box-shadow: 0 0 15px #0ff;
     }
-
-    .footer {
-      margin-top: 40px;
-      color: #888;
-      font-size: 14px;
+    input[type="file"] {
+      margin: 10px 0;
+      color: #fff;
     }
   </style>
 </head>
 <body>
+  <h1>🔥 Code Minifier 🔥</h1>
 
-  <h1>🔥 Code Minifier Tool</h1>
-
-  <input type="file" id="fileInput" accept=".js,.css,.html,.txt" />
-  
+  <input type="file" id="fileInput" />
   <textarea id="inputCode" placeholder="Paste your code here..."></textarea>
 
-  <div class="buttons">
+  <div>
     <button onclick="minifyJS()">Minify JS</button>
     <button onclick="minifyCSS()">Minify CSS</button>
     <button onclick="minifyHTML()">Minify HTML</button>
   </div>
 
-  <textarea id="outputCode" placeholder="Minified output appears here..."></textarea>
+  <textarea id="outputCode" placeholder="Minified code will appear here..."></textarea>
 
-  <div class="buttons">
-    <button onclick="copyCode()">Copy</button>
+  <div>
+    <button onclick="copyCode()">Copy Code</button>
     <button onclick="downloadCode()">Download</button>
   </div>
 
-  <div class="footer">
-    Made by Emmy 💻 — Offline, Fast & Powerful
-  </div>
-
-  <!-- Scripts -->
-  <script src="terser.min.js"></script>
+  <!-- JavaScript Dependencies -->
+  <script src="bundle.min.js"></script>
   <script src="csso.min.js"></script>
   <script src="htmlminifier.min.js"></script>
 
   <script>
-    // File Upload
+    // Upload from device
     document.getElementById("fileInput").addEventListener("change", function () {
       const reader = new FileReader();
       reader.onload = function () {
@@ -102,7 +88,7 @@
       reader.readAsText(this.files[0]);
     });
 
-    // JS Minify (async fix)
+    // JS Minifier
     async function minifyJS() {
       try {
         const input = document.getElementById("inputCode").value;
@@ -114,7 +100,7 @@
       }
     }
 
-    // CSS Minify
+    // CSS Minifier
     function minifyCSS() {
       try {
         const input = document.getElementById("inputCode").value;
@@ -125,11 +111,11 @@
       }
     }
 
-    // HTML Minify
+    // HTML Minifier
     function minifyHTML() {
       try {
         const input = document.getElementById("inputCode").value;
-        const result = window.htmlMinifier.minify(input, {
+        const result = minify(input, {
           collapseWhitespace: true,
           removeComments: true,
           removeRedundantAttributes: true,
@@ -141,7 +127,6 @@
       }
     }
 
-    // Copy to clipboard
     function copyCode() {
       const output = document.getElementById("outputCode");
       output.select();
@@ -149,7 +134,6 @@
       alert("Copied!");
     }
 
-    // Download file
     function downloadCode() {
       const blob = new Blob([document.getElementById("outputCode").value], { type: "text/plain" });
       const link = document.createElement("a");
