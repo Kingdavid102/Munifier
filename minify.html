@@ -1,146 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Code Minifier</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap">
   <style>
-    body {
-      font-family: 'Orbitron', sans-serif;
-      background: #0f0f0f;
-      color: #fff;
-      padding: 20px;
-      text-align: center;
-    }
-    h1 {
-      font-size: 2em;
-      margin-bottom: 20px;
-      color: #0ff;
-      text-shadow: 0 0 10px #0ff;
-    }
-    textarea {
-      width: 90%;
-      height: 200px;
-      margin: 10px auto;
-      display: block;
-      background: #111;
-      color: #0f0;
-      border: 1px solid #0ff;
-      padding: 10px;
-      border-radius: 10px;
-      resize: vertical;
-    }
-    button {
-      background: #111;
-      color: #0ff;
-      border: 2px solid #0ff;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 1em;
-      text-shadow: 0 0 5px #0ff;
-      transition: 0.3s ease;
-    }
-    button:hover {
-      background: #0ff;
-      color: #111;
-      box-shadow: 0 0 15px #0ff;
-    }
-    input[type="file"] {
-      margin: 10px 0;
-      color: #fff;
-    }
+    body { background: #0f0f0f; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+    h1 { color: #0ff; text-shadow: 0 0 8px #0ff; margin-bottom: 1rem; }
+    textarea { width: 90%; height: 180px; background: #111; color: #0f0; border: 1px solid #0ff; padding: 10px; border-radius: 8px; margin: 10px auto; display: block; resize: vertical; }
+    button { background: none; color: #0ff; border: 2px solid #0ff; padding: .8rem 1.5rem; margin: 5px; border-radius: 8px; cursor: pointer; transition: .2s; }
+    button:hover { background: #0ff; color: #111; box-shadow: 0 0 8px #0ff; }
+    input[type="file"] { margin: 1rem 0; color: #fff; }
   </style>
 </head>
 <body>
-  <h1>🔥 Code Minifier 🔥</h1>
 
-  <input type="file" id="fileInput" />
-  <textarea id="inputCode" placeholder="Paste your code here..."></textarea>
+<h1>🔥 Code Minifier Tool</h1>
 
-  <div>
-    <button onclick="minifyJS()">Minify JS</button>
-    <button onclick="minifyCSS()">Minify CSS</button>
-    <button onclick="minifyHTML()">Minify HTML</button>
-  </div>
+<input type="file" id="fileInput" accept=".js,.css,.html,.txt">
+<textarea id="inputCode" placeholder="Paste or upload code"></textarea>
 
-  <textarea id="outputCode" placeholder="Minified code will appear here..."></textarea>
+<div>
+  <button onclick="minifyJS()">Minify JS</button>
+  <button onclick="minifyCSS()">Minify CSS</button>
+  <button onclick="minifyHTML()">Minify HTML</button>
+</div>
 
-  <div>
-    <button onclick="copyCode()">Copy Code</button>
-    <button onclick="downloadCode()">Download</button>
-  </div>
+<textarea id="outputCode" placeholder="Minified output appears here"></textarea>
 
-  <!-- JavaScript Dependencies -->
-  <script src="bundle.min.js"></script>
-  <script src="csso.min.js"></script>
-  <script src="htmlminifier.umd.bundle.min.js"></script>
+<div>
+  <button onclick="copyCode()">Copy Code</button>
+  <button onclick="downloadCode()">Download</button>
+</div>
 
-  <script>
-    // Upload from device
-    document.getElementById("fileInput").addEventListener("change", function () {
-      const reader = new FileReader();
-      reader.onload = function () {
-        document.getElementById("inputCode").value = reader.result;
-      };
-      reader.readAsText(this.files[0]);
+<script src="bundle.min.js"></script>
+<script src="csso.min.js"></script>
+<script src="htmlminifier.umd.bundle.min.js"></script> <!-- Correct bundle -->
+
+<script>
+document.getElementById('fileInput').addEventListener('change', function() {
+  const reader = new FileReader();
+  reader.onload = () => { document.getElementById('inputCode').value = reader.result; };
+  reader.readAsText(this.files[0]);
+});
+
+// JS
+async function minifyJS(){
+  try {
+    const res = await Terser.minify(document.getElementById('inputCode').value);
+    if (res.error) throw res.error;
+    document.getElementById('outputCode').value = res.code;
+  } catch(e){ alert('JS error: ' + e.message); }
+}
+
+// CSS
+function minifyCSS(){
+  try {
+    const r = csso.minify(document.getElementById('inputCode').value);
+    document.getElementById('outputCode').value = r.css;
+  } catch(e){ alert('CSS error: ' + e.message); }
+}
+
+// HTML
+function minifyHTML(){
+  try {
+    const r = minify(document.getElementById('inputCode').value, {
+      collapseWhitespace: true,
+      removeComments: true,
+      removeRedundantAttributes: true,
+      removeEmptyAttributes: true,
+      minifyJS: true,
+      minifyCSS: true
     });
+    document.getElementById('outputCode').value = r;
+  } catch(e){ alert('HTML error: ' + e.message); }
+}
 
-    // JS Minifier
-    async function minifyJS() {
-      try {
-        const input = document.getElementById("inputCode").value;
-        const result = await Terser.minify(input);
-        if (result.error) throw result.error;
-        document.getElementById("outputCode").value = result.code;
-      } catch (err) {
-        alert("Error minifying JS: " + err.message);
-      }
-    }
+// Copy & Download
+function copyCode(){
+  const o = document.getElementById('outputCode');
+  o.select(); document.execCommand('copy');
+  alert('Copied to clipboard!');
+}
+function downloadCode(){
+  const blob = new Blob([document.getElementById('outputCode').value], { type: 'text/plain' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'minified.txt';
+  link.click();
+}
+</script>
 
-    // CSS Minifier
-    function minifyCSS() {
-      try {
-        const input = document.getElementById("inputCode").value;
-        const result = csso.minify(input);
-        document.getElementById("outputCode").value = result.css;
-      } catch (err) {
-        alert("Error minifying CSS: " + err.message);
-      }
-    }
-
-    // HTML Minifier
-    function minifyHTML() {
-      try {
-        const input = document.getElementById("inputCode").value;
-        const result = minify(input, {
-          collapseWhitespace: true,
-          removeComments: true,
-          removeRedundantAttributes: true,
-          removeEmptyAttributes: true
-        });
-        document.getElementById("outputCode").value = result;
-      } catch (err) {
-        alert("Error minifying HTML: " + err.message);
-      }
-    }
-
-    function copyCode() {
-      const output = document.getElementById("outputCode");
-      output.select();
-      document.execCommand("copy");
-      alert("Copied!");
-    }
-
-    function downloadCode() {
-      const blob = new Blob([document.getElementById("outputCode").value], { type: "text/plain" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "minified.txt";
-      link.click();
-    }
-  </script>
 </body>
 </html>
