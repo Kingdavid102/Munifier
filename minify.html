@@ -1,74 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Code Minifier</title>
   <style>
     body {
       background: #0f0f0f;
-      color: #fff;
+      color: #f0f0f0;
       font-family: 'Segoe UI', sans-serif;
-      padding: 2rem;
       text-align: center;
+      padding: 20px;
     }
+
+    h1 {
+      color: #00ff88;
+      text-shadow: 0 0 10px #00ff88;
+    }
+
     textarea {
       width: 90%;
       height: 200px;
-      background: #1c1c1c;
-      border: 1px solid #444;
-      color: #fff;
-      padding: 1rem;
-      font-size: 14px;
-      border-radius: 8px;
-      margin-top: 1rem;
+      margin: 10px auto;
+      background: #1a1a1a;
+      color: #ffffff;
+      border: 1px solid #00ff88;
+      padding: 10px;
+      border-radius: 10px;
+      resize: vertical;
     }
-    button {
-      background: linear-gradient(to right, #0f0, #0ff);
-      border: none;
-      color: black;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 25px;
-      cursor: pointer;
-      margin: 10px;
-      box-shadow: 0 0 10px #0ff;
-    }
-    button:hover {
-      box-shadow: 0 0 20px #0f0;
-    }
-    .btns {
-      margin-top: 1rem;
-    }
+
     input[type="file"] {
-      margin-top: 1rem;
+      margin: 10px;
+    }
+
+    .buttons {
+      margin: 20px;
+    }
+
+    button {
+      background: linear-gradient(90deg, #00ff88, #007766);
       color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ff88;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00ff88;
+    }
+
+    .footer {
+      margin-top: 40px;
+      color: #888;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h1>🔥 Code Minifier</h1>
 
-  <input type="file" id="fileInput" />
-  <div class="btns">
+  <h1>🔥 Code Minifier Tool</h1>
+
+  <input type="file" id="fileInput" accept=".js,.css,.html,.txt" />
+  
+  <textarea id="inputCode" placeholder="Paste your code here..."></textarea>
+
+  <div class="buttons">
     <button onclick="minifyJS()">Minify JS</button>
     <button onclick="minifyCSS()">Minify CSS</button>
     <button onclick="minifyHTML()">Minify HTML</button>
   </div>
 
-  <textarea id="inputCode" placeholder="Paste your code or upload a file..."></textarea>
-  <textarea id="outputCode" placeholder="Minified code will appear here..."></textarea>
+  <textarea id="outputCode" placeholder="Minified output appears here..."></textarea>
 
-  <div class="btns">
+  <div class="buttons">
     <button onclick="copyCode()">Copy</button>
     <button onclick="downloadCode()">Download</button>
   </div>
 
-  <!-- Terser JS (JS Minifier) -->
-  <script src="https://cdn.jsdelivr.net/npm/terser@5.19.2/dist/bundle.min.js"></script>
-  <!-- CSSO (CSS Minifier) -->
-  <script src="https://cdn.jsdelivr.net/npm/csso@5.0.5/dist/csso.min.js"></script>
-  <!-- HTML Minifier -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-minifier/4.0.0/htmlminifier.min.js"></script>
+  <div class="footer">
+    Made by Emmy 💻 — Offline, Fast & Powerful
+  </div>
+
+  <!-- Scripts -->
+  <script src="terser.min.js"></script>
+  <script src="csso.min.js"></script>
+  <script src="htmlminifier.min.js"></script>
 
   <script>
     // File Upload
@@ -80,11 +102,11 @@
       reader.readAsText(this.files[0]);
     });
 
-    // JS Minify
-    function minifyJS() {
+    // JS Minify (async fix)
+    async function minifyJS() {
       try {
         const input = document.getElementById("inputCode").value;
-        const result = Terser.minify(input);
+        const result = await Terser.minify(input);
         if (result.error) throw result.error;
         document.getElementById("outputCode").value = result.code;
       } catch (err) {
@@ -107,7 +129,7 @@
     function minifyHTML() {
       try {
         const input = document.getElementById("inputCode").value;
-        const result = minify(input, {
+        const result = window.htmlMinifier.minify(input, {
           collapseWhitespace: true,
           removeComments: true,
           removeRedundantAttributes: true,
@@ -119,6 +141,7 @@
       }
     }
 
+    // Copy to clipboard
     function copyCode() {
       const output = document.getElementById("outputCode");
       output.select();
@@ -126,6 +149,7 @@
       alert("Copied!");
     }
 
+    // Download file
     function downloadCode() {
       const blob = new Blob([document.getElementById("outputCode").value], { type: "text/plain" });
       const link = document.createElement("a");
