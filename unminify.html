@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Offline Unminifier</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #00ffe7;
+      margin-bottom: 20px;
+    }
+
+    select, textarea, button {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    select {
+      padding: 10px;
+      background: #1a1a1a;
+      color: #fff;
+      border: 1px solid #00ffe7;
+      border-radius: 6px;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 900px;
+      height: 250px;
+      background: #111;
+      color: #00ffe7;
+      padding: 12px;
+      border: 1px solid #00ffe7;
+      border-radius: 8px;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #ff00ff, #7a00ff);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      color: #fff;
+      cursor: pointer;
+      margin: 8px;
+      box-shadow: 0 0 15px #ff00ff;
+      transition: transform 0.2s ease, box-shadow 0.3s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #ff00cc;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧯 Offline Code Unminifier</h1>
+
+  <label for="lang">Select Language:</label>
+  <select id="lang">
+    <option value="js">JavaScript</option>
+    <option value="css">CSS</option>
+    <option value="html">HTML</option>
+  </select>
+
+  <textarea id="input" placeholder="Paste your minified code here..."></textarea>
+  <div class="actions">
+    <button class="btn" onclick="unminify()">Unminify</button>
+    <button class="btn" onclick="copyResult()">Copy</button>
+    <button class="btn" onclick="downloadResult()">Download</button>
+  </div>
+  <textarea id="output" placeholder="Unminified code will appear here..."></textarea>
+
+  <script src="beautify.js"></script>
+  <script src="beautify-css.js"></script>
+  <script src="beautify-html.js"></script>
+
+  <script>
+    function unminify() {
+      const lang = document.getElementById("lang").value;
+      const input = document.getElementById("input").value;
+      let output = "";
+
+      try {
+        if (lang === "js") {
+          output = js_beautify(input);
+        } else if (lang === "css") {
+          output = css_beautify(input);
+        } else if (lang === "html") {
+          output = html_beautify(input);
+        }
+        document.getElementById("output").value = output;
+      } catch (err) {
+        document.getElementById("output").value = "Error: " + err.message;
+      }
+    }
+
+    function copyResult() {
+      const output = document.getElementById("output");
+      output.select();
+      document.execCommand("copy");
+      alert("Code copied!");
+    }
+
+    function downloadResult() {
+      const content = document.getElementById("output").value;
+      const lang = document.getElementById("lang").value;
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `unminified.${lang}`;
+      a.click();
+    }
+  </script>
+</body>
+</html>
