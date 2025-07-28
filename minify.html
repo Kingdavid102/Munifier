@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Offline Minifier</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    h1 {
+      color: #4caf50;
+      margin-bottom: 1rem;
+    }
+    textarea {
+      width: 90%;
+      height: 200px;
+      margin-bottom: 1rem;
+      background: #1c1c1c;
+      color: #0f0;
+      border: 1px solid #333;
+      padding: 10px;
+      font-size: 14px;
+    }
+    .btn {
+      background: linear-gradient(135deg, #00ffcc, #0099ff);
+      border: none;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      margin: 0.3rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ffe0, 0 0 20px #00ffe0;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+    }
+    .output-box {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 Offline Code Minifier</h1>
+
+  <textarea id="codeInput" placeholder="Paste your code here..."></textarea><br/>
+
+  <button class="btn" onclick="minifyJS()">Minify JS</button>
+  <button class="btn" onclick="minifyCSS()">Minify CSS</button>
+  <button class="btn" onclick="minifyHTML()">Minify HTML</button>
+
+  <div class="output-box">
+    <textarea id="codeOutput" placeholder="Minified output..."></textarea><br/>
+    <button class="btn" onclick="copyOutput()">Copy</button>
+    <button class="btn" onclick="downloadOutput()">Download</button>
+  </div>
+
+  <!-- Scripts -->
+  <script src="terser.min.js"></script>
+  <script src="htmlminifier.min.js"></script>
+  <script src="csso.min.js"></script>
+
+  <script>
+    function minifyJS() {
+      const input = document.getElementById("codeInput").value;
+      const result = Terser.minify(input);
+      document.getElementById("codeOutput").value = result.code || "Error minifying JS.";
+    }
+
+    function minifyCSS() {
+      const input = document.getElementById("codeInput").value;
+      const output = csso.minify(input).css;
+      document.getElementById("codeOutput").value = output;
+    }
+
+    function minifyHTML() {
+      const input = document.getElementById("codeInput").value;
+      const output = minify(input, {
+        collapseWhitespace: true,
+        removeComments: true,
+        minifyJS: true,
+        minifyCSS: true
+      });
+      document.getElementById("codeOutput").value = output;
+    }
+
+    function copyOutput() {
+      const text = document.getElementById("codeOutput");
+      text.select();
+      document.execCommand("copy");
+      alert("Copied to clipboard!");
+    }
+
+    function downloadOutput() {
+      const blob = new Blob([document.getElementById("codeOutput").value], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "minified.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+  </html>
